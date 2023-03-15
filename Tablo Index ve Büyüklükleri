@@ -1,0 +1,24 @@
+SELECT
+    tbl.NAME AS Tabloİsmi,
+    s.Name AS Şemaİsmi,
+    p.rows AS SatırSayısı,
+    SUM(au.total_pages) * 8 AS ToplamBüyüklükKB,
+    SUM(au.used_pages) * 8 AS KullanılanBüyüklükKB,
+    (SUM(au.total_pages) - SUM(au.used_pages)) * 8 AS KullanılmayanAlanKB
+FROM
+    sys.tables tbl
+INNER JOIN     
+    sys.indexes ind ON tbl.OBJECT_ID = ind.OBJECT_ID
+INNER JOIN
+    sys.partitions p ON ind.OBJECT_ID = p.OBJECT_ID AND ind.index_id = p.index_id
+INNER JOIN
+    sys.allocation_units au ON p.PARTITION_ID = au.container_id
+LEFT OUTER JOIN
+    sys.schemas s ON tbl.SCHEMA_ID = s.SCHEMA_ID
+WHERE
+tbl.is_ms_shipped = 0
+    AND ind.OBJECT_ID > 255
+GROUP BY
+    tbl.Name, s.Name, p.Rows
+ORDER BY
+    SUM(au.total_pages) DESC
