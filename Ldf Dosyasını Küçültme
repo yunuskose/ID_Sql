@@ -1,0 +1,5 @@
+
+SELECT name, recovery_model_desc FROM sys.databases
+USE master;
+ALTER DATABASE NETSISDATA SET RECOVERY SIMPLE; -- Database'i önce FULL'den SIMPLE'ye çeviriyoruz
+DBCC SHRINKDATABASE (NETSISDATA);
